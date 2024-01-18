@@ -1,10 +1,3 @@
-//
-//  main.cpp
-//  hello
-//
-//  Created by 황연경 on 12/31/23.
-//
-
 #include <iostream>
 #include <cstring>
 
@@ -29,4 +22,3 @@ int main(int argc, const char * argv[]) {
     }
     return 0;
 }
-
