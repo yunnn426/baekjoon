@@ -1,39 +1,36 @@
 #include <iostream>
+#include <list>
+#include <vector>
 
 using namespace std;
 
-int main() {
-    ios::sync_with_stdio(false); 
-    cin.tie(NULL); cout.tie(NULL);
-
+int main(void) {
+    cin.tie(NULL); ios_base::sync_with_stdio(false);
+    
     int n;
     cin >> n;
-    int height[12] = {0,};
-    int answer[12] = {0,};
-    for (int i = 1; i <= n; i++) {
-        cin >> height[i];
+    vector<int> height;
+    list<int> answer;
+    for (int i = 0; i < n; i++) {
+        int tmp;
+        cin >> tmp;
+        height.push_back(tmp);
     }
-
-    int tmp = 0;
-    for (int i = 1; i <= n; i++) {
-        tmp = height[i];
-        for (int j = 1; j <= n; j++) {
-            if (tmp == 0) {
-                int count = 0;
-                if (answer[j] != 0)
-                    continue;
-                answer[j + count] = i;
-                break;
-            }
-            if (answer[j] == 0)
-                tmp--;
+    
+    
+    for (int i = n - 1; i >= 0; i--) {
+        auto iter = answer.begin();
+        for (int j = 0; j < height[i]; j++) {
+            iter++;
         }
+        answer.insert(iter, i + 1);
     }
-
-    for (int i = 1; i <= n; i++) {
-        cout << answer[i] << " ";
+    
+    for (auto iter = answer.begin(); iter != answer.end(); iter++) {
+        cout << *iter << " ";
     }
     cout << "\n";
-
+    
     return 0;
 }
+
