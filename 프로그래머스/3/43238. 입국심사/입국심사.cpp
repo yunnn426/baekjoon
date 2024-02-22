@@ -23,26 +23,17 @@ long long solution(int nInt, vector<int> times) {
         long long cap = 0;
         for (int i = 0; i < (long long)times.size(); i++) {
             cap += (mid / (long long)times[i]);
+            
+            if (cap >= n) { // cap이 n 이상이면 정답 가능, 더 작은 정답 찾기 위해 결과 저장하고 계속 탐색 
+                end = mid - 1;
+                answer = mid;
+                break;
+            }
         }
-        if (cap > n) {
-            end = mid - 1;     
-        }
-        else {
-            start = mid + 1;
-            answer = mid;
-        }
-    }
-    
-    while (true) {
-        long long cap = 0;
-        for (int i = 0; i < (long long)times.size(); i++) {
-            cap += (answer / (long long)times[i]);
-        }
+        
         if (cap < n) {
-            answer += 1;
-            break;
+            start = mid + 1;
         }
-        answer -= 1;
     }
     
     return answer;
