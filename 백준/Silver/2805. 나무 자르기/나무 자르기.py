@@ -4,7 +4,6 @@ tree = list(map(int, sys.stdin.readline().split()))
 
 start = 0
 end = 1000000000
-answer = 0
 
 while start <= end:
     mid = (start + end) // 2
@@ -16,11 +15,9 @@ while start <= end:
             sum += cut
 
     if sum >= m:
-        answer = mid
         start = mid + 1
         
     else:
         end = mid - 1
     
-
-print(answer)
+print(end)
