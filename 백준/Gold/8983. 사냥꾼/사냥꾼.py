@@ -3,6 +3,7 @@ import sys
 m, n, l = map(int, sys.stdin.readline().split())
 
 shoot = list(map(int, sys.stdin.readline().split()))
+shoot.sort()
 animal = []
 hunted = [0 for _ in range(n)] # 사냥 여부 체크
 
@@ -11,19 +12,22 @@ for _ in range(n):
     animal.append(arr)
 
 answer = 0
-for i in shoot: # 각 사대에서
-    start = [i, 0]
+for a in animal: # 동물 위치에서 사냥 가능한 사대 찾기
+    x, y = a[0], a[1]
+    find1 = x - l + y # find1 ~ find2 범위 안에 사대가 존재하는지 찾기
+    find2 = x + l - y
 
-    for i in range(n): # 사냥할 수 있는 동물 체크
-        if hunted[i] != 0: # 이미 사냥됨
-            continue
+    start = 0
+    end = len(shoot) - 1
+    while start <= end:
+        mid = (start + end) // 2
 
-        target = animal[i]
-        dw = abs(target[0] - start[0])
-        dh = abs(target[1] - start[1])
-
-        if dw + dh <= l: # 사정거리 안이면
+        if find1 <= shoot[mid] <= find2: # 사대 존재
             answer += 1
-            hunted[i] = 1
-
+            break
+        elif shoot[mid] > find2:
+            end = mid - 1
+        else:
+            start = mid + 1
+    
 print(answer)
