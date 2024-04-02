@@ -1,5 +1,5 @@
 import sys
-
+sys.setrecursionlimit(10**6)
 n = int(sys.stdin.readline())
 
 inside = [-1 for _ in range(n + 1)] # 실내 여부 1: 실내, 0: 실외
