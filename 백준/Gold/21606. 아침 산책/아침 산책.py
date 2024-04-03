@@ -8,31 +8,44 @@ for i in range(len(string)):
     inside[i + 1] = int(string[i])
 
 graph = [[] for _ in range(n + 1)]
+answer = 0
 for _ in range(n - 1):
     a, b = map(int, sys.stdin.readline().split())
     graph[a].append(b)
     graph[b].append(a)
+    # 실내 -> 실내 * 2
+    if inside[a] == 1 and inside[b] == 1:
+        answer += 2
 
-answer = 0
 visited = [0 for _ in range(n + 1)]
-def dfs(start, x):
-    if start != x and inside[x] == 1: # 시작 노드가 아닌 실내 노드 들어가면 경로 끝, 정답 ++
-        global answer
-        answer += 1
-        return
-    
+temp = 0
+def dfs(x):
     for i in graph[x]:
         if visited[i] != 0:
             continue
-        visited[i] = 1
-        dfs(start, i)
+        
+        if inside[i] == 1:
+            global temp
+            temp += 1
+        else:
+            visited[i] = 1
+            dfs(i) # 재귀할 때만 visit
+
+    return temp
         
 
 for i in range(1, n + 1):
-    visited = [0 for _ in range(n + 1)]
-    if inside[i] == 0: # 실외에서 시작할 수 없음
+    # 실외에 연결된 실내 노드 개수 n을 구하고
+    # n * (n - 1)이 가능한 경로 수
+    temp = 0
+    if inside[i] == 1: 
+        continue
+
+    if visited[i] != 0:
         continue
     visited[i] = 1
-    dfs(i, i)
+    result = dfs(i)
 
+    answer += result * (result - 1)
+    
 print(answer)
