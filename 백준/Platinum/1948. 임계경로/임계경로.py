@@ -40,7 +40,7 @@ while q:
             q.append(nd)
 
 # 경로 개수 찾기
-max_route = set()
+max_route = []
 q = deque()
 q.append(dst)
 while q:
@@ -48,7 +48,7 @@ while q:
 
     for i in prev[idx]:
         if (idx, i) not in max_route:
-            max_route.add((idx, i))
+            max_route.append((idx, i))
             q.append(i)
 
 print(distance[dst])
