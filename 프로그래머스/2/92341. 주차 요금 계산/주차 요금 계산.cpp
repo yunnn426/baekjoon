@@ -7,23 +7,21 @@
 
 using namespace std;
 
+
 vector<string> split_record(string record) {
     istringstream iss(record);
     string buffer;
     vector<string> result;
 
-    while (getline(iss, buffer, ' ')) {
+    while (getline(iss, buffer, ' '))
         result.push_back(buffer);
-        //cout << buffer << endl;
-    }
     
     return result;
 }
 
 vector<int> solution(vector<int> fees, vector<string> records) {
     vector<int> answer;
-    vector<vector<string>> car_record;
-    map<string, int> res;
+    map<string, vector<int>> res; // 차 - 요금 - 카운트
     
     // fees
     int b_time = fees[0];
@@ -34,58 +32,43 @@ vector<int> solution(vector<int> fees, vector<string> records) {
     
     for (int i = 0; i < records.size(); i++) {
         vector<string> split_r1 = split_record(records[i]);
+        string c_time = split_r1[0];
         string c_num1 = split_r1[1];
-
-        if (split_r1[2] == "OUT")
-            continue;
+        string c_log = split_r1[2];
         
-        bool found = false; // 입차 후 출차하였는지 체크
-        vector<string> split_r2;
-        for (int j = i + 1; j < records.size(); j++) {
-            split_r2 = split_record(records[j]);
-            string c_num2 = split_r2[1];
-            if (c_num1 == c_num2) { // 입차-출차 짝이 맞으면
-                found = true;
-                break;
-            }
-        }
+        int hour = stoi(c_time.substr(0, 2));
+        int min = stoi(c_time.substr(3, 2));
+        int t = hour * 60 + min;
         
-        // cal time
-        if (found) {
-            in_hour = stoi(split_r1[0].substr(0, 2));
-            in_min = stoi(split_r1[0].substr(3, 2));
-            out_hour = stoi(split_r2[0].substr(0, 2));
-            out_min = stoi(split_r2[0].substr(3, 2));
+        if (c_log == "IN")
+            t *= -1;
+        
+        bool found = false;
+        auto item = res.find(c_num1);
+        if (item != res.end()) {
+            int new_time = item->second[0] + t;
+            int count = item->second[1] + 1;
+            vector<int> tmp;
+            tmp.push_back(new_time);
+            tmp.push_back(count);
+            res.erase(c_num1);
+            res.insert({c_num1, tmp});
         }
         else {
-            in_hour = stoi(split_r1[0].substr(0, 2));
-            in_min = stoi(split_r1[0].substr(3, 2));
-            out_hour = 23;
-            out_min = 59;
+            vector<int> tmp;
+            tmp.push_back(t);
+            tmp.push_back(1);
+            res.insert({c_num1, tmp});
         }
-        in_time = in_hour * 60 + in_min;
-        out_time = out_hour * 60 + out_min;
-        time = out_time - in_time;
-
-        bool before = false;
-        for (auto item : res) {
-            if (item.first == c_num1) {
-                item.second += time;
-                res.erase(c_num1);
-                res.insert({c_num1, item.second});
-                before = true;
-                break;
-            }
-        }
-        
-        if (!before)
-            res.insert({c_num1, time});
-        
     }
     
     for (auto item : res) {
         int fee;
-        int time = item.second;
+        int time = item.second[0];
+        int cnt = item.second[1];
+        
+        if (cnt % 2 != 0) // 입-출 짝 안맞으면
+            time += 23 * 60 + 59; // 23:59에 출차
 
         if (time < b_time) {
             fee = b_fee;
