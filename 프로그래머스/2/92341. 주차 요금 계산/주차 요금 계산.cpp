@@ -1,73 +1,105 @@
-#include <iostream>
 #include <string>
 #include <vector>
-#include <set>
-#include <cmath>
+#include <iostream>
+#include <sstream>
+#include <map>
+#include <algorithm>
 
 using namespace std;
 
-vector<int> solution(vector<int> fees, vector<string> records) {
-    vector<int> answer;
-    
-    int b_min = fees[0]; // 기본 시간
-    int b_fee = fees[1]; // 기본 요금
-    int p_min = fees[2]; // 단위 시간
-    int p_fee = fees[3]; // 단위 요금
-    
-    // 차량번호 배열
-    set<string> car_nums;
-    for (int i = 0; i < records.size(); i++) {
-        string car = records[i].substr(6, 4);
-        car_nums.insert(car);
+vector<string> split_record(string record) {
+    istringstream iss(record);
+    string buffer;
+    vector<string> result;
+
+    while (getline(iss, buffer, ' ')) {
+        result.push_back(buffer);
+        //cout << buffer << endl;
     }
     
-    for (auto iter = car_nums.begin(); iter != car_nums.end(); iter++) {
-        int intime = -1;
-        int outtime = -1;
-        int timesum = 0;
+    return result;
+}
+
+vector<int> solution(vector<int> fees, vector<string> records) {
+    vector<int> answer;
+    vector<vector<string>> car_record;
+    map<string, int> res;
+    
+    // fees
+    int b_time = fees[0];
+    int b_fee = fees[1]; 
+    int t_time = fees[2];
+    int t_fee = fees[3];
+    int in_hour, in_min, out_hour, out_min, in_time, out_time, time;
+    
+    for (int i = 0; i < records.size(); i++) {
+        vector<string> split_r1 = split_record(records[i]);
+        string c_num1 = split_r1[1];
+
+        if (split_r1[2] == "OUT")
+            continue;
         
-        for (int i = 0; i < records.size(); i++) {
-            string time = records[i].substr(0, 5);
-            string car = records[i].substr(6, 4);
-            string inout = records[i].substr(11, 2);
-            
-            if (car == *iter) {
-                if (inout == "IN") {
-                    intime = stoi(time.substr(0, 2)) * 60 + stoi(time.substr(3, 2));
-                    cout << "IN: " << intime << endl;
-                }
-                else {
-                    outtime = stoi(time.substr(0, 2)) * 60 + stoi(time.substr(3, 2));
-                    cout << "OUT: " << outtime << endl;
-                    timesum += outtime - intime;
-                    intime = -1;
-                    outtime = -1;
-                }
+        bool found = false; // 입차 후 출차하였는지 체크
+        vector<string> split_r2;
+        for (int j = i + 1; j < records.size(); j++) {
+            split_r2 = split_record(records[j]);
+            string c_num2 = split_r2[1];
+            if (c_num1 == c_num2) { // 입차-출차 짝이 맞으면
+                found = true;
+                break;
             }
-            
-            
         }
         
-        if (intime != -1) { // records를 다 돌았는데도 출차 기록을 찾지 못함 (23:59에 출차)
-            timesum += 1439 - intime;
+        // cal time
+        if (found) {
+            in_hour = stoi(split_r1[0].substr(0, 2));
+            in_min = stoi(split_r1[0].substr(3, 2));
+            out_hour = stoi(split_r2[0].substr(0, 2));
+            out_min = stoi(split_r2[0].substr(3, 2));
+        }
+        else {
+            in_hour = stoi(split_r1[0].substr(0, 2));
+            in_min = stoi(split_r1[0].substr(3, 2));
+            out_hour = 23;
+            out_min = 59;
+        }
+        in_time = in_hour * 60 + in_min;
+        out_time = out_hour * 60 + out_min;
+        time = out_time - in_time;
+
+        bool before = false;
+        for (auto item : res) {
+            if (item.first == c_num1) {
+                item.second += time;
+                res.erase(c_num1);
+                res.insert({c_num1, item.second});
+                before = true;
+                break;
+            }
         }
         
-        int fee = 0;
-        if (timesum <= b_min) {
+        if (!before)
+            res.insert({c_num1, time});
+        
+    }
+    
+    for (auto item : res) {
+        int fee;
+        int time = item.second;
+
+        if (time < b_time) {
             fee = b_fee;
         }
         else {
-            double over_min = (timesum - b_min) / (double)p_min;
-            int over = over_min;
-            if (fmod(over_min, 1) != 0) { // 단위시간으로 나누어 떨어지지 않으면
-                over += 1;
+            if ((time - b_time) % t_time == 0) {
+                fee = b_fee + (time - b_time) / t_time * t_fee;
             }
-            fee = b_fee + over * p_fee;
+            else {
+                fee = b_fee + ((time - b_time) / t_time + 1) * t_fee;
+            }
         }
-        
         answer.push_back(fee);
     }
-    
     
     return answer;
 }
