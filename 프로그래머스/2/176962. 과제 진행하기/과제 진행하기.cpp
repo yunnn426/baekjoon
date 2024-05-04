@@ -37,7 +37,6 @@ vector<string> solution(vector<vector<string>> plans) {
             if (done && stoi(time) > 0 && start_time[i] < t) {
                 job_idx = i;
                 // cout << "이전 작업: " << plans[job_idx][0] << endl;
-                // break;
             }
         }
         

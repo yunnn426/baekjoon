@@ -1,10 +1,10 @@
 # [level 2] 과제 진행하기 - 176962 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/176962#) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/176962#qna) 
 
 ### 성능 요약
 
-메모리: 4.21 MB, 시간: 2598.09 ms
+메모리: 4.16 MB, 시간: 2678.98 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2024년 05월 04일 12:24:40
+2024년 05월 04일 12:56:42
 
 ### 문제 설명
 
