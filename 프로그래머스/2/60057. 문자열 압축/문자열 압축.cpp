@@ -1,53 +1,48 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <climits>
-#include <queue>
-#include <algorithm>
 
 using namespace std;
 
 int solution(string s) {
-    int answer = 0;
-    vector<int> results;
+    int n = s.length();
+    int ans = n;
     
-    for (int unit = 1; unit <= s.length(); unit++) {
-        queue<string> cut;
-        int idx = 0;
-        while (true) {
-            string ss = s.substr(idx, unit);
-            cut.push(ss);
-            if (idx + unit >= s.length()) {
-                break;
+    for (int cut = 1; cut <= n / 2; cut++) {
+        int answer = 0;
+        
+        /* cut만큼 잘라서 배열에 추가 */
+        vector<string> subarr;
+        int st = 0, ed = n - 1;
+        
+        while (st <= ed) {
+            string sub = s.substr(st, cut);
+            st += cut;
+            subarr.push_back(sub);
+        }
+        subarr.push_back("end");
+        
+        string cmp = subarr[0];
+        int cnt = 1;
+        for (int i = 1; i < subarr.size(); i++) {
+            // 비교하는 문자열이랑 같으면 카운트 +1
+            if (cmp == subarr[i]) {
+                cnt += 1;
             }
-            idx = idx + unit;
+            // 다르면
+            else {
+                // 문자열 길이만큼 더하고
+                answer += cmp.length();
+                // 2 이상인 경우 +길이
+                if (cnt > 1)
+                    answer += to_string(cnt).length();
+                // 다시 초기화
+                cnt = 1;
+                cmp = subarr[i];
+            }
         }
         
-        string zip_s = "";
-        while (!cut.empty()) {
-            string a = cut.front();
-            cut.pop();
-            int cnt = 1;
-            while (!cut.empty()) {
-                string cmp = cut.front();
-                if (cmp == a) {
-                    cnt += 1;
-                    cut.pop();
-                }
-                else {
-                    break;
-                }
-            }
-            if (cnt != 1)
-                zip_s += to_string(cnt);
-            zip_s += a;
-        }
-        
-        results.push_back(zip_s.length());
+        ans = min(ans, answer);
     }
-    
-    sort(results.begin(), results.end());
-    answer = results[0];
-    
-    return answer;
+    return ans;
 }
