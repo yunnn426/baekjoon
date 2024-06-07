@@ -1,39 +1,39 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-int answer = 0, total;
 vector<vector<int>> computer;
+int n; 
 int visited[205] = {0,};
 
-void search(int cnt, int x) {
-    if (cnt == total) {
-        return;
-    }
-    for (int i = 0; i < computer[x].size(); i++) {
-       if (visited[i] != 0) 
-           continue;
-        if (computer[x][i] == 1) {
-            visited[i] = 1;
-            //cout << "\t" << x << " connected to " << i << endl;
-            search(cnt + 1, i);
-        }
+void dfs(int from) {
+    for (int to = 0; to < n; to++) {
+        if (visited[to] != 0)
+            continue;
+        if (computer[from][to] == 0)
+            continue;
+        
+        visited[to] = 1;
+        dfs(to);
     }
 }
 
-int solution(int n, vector<vector<int>> computers) {
-    total = n;
+int solution(int m, vector<vector<int>> computers) {
+    n = m;
     computer = computers;
     
-    for (int i = 0; i < computers.size(); i++) {
+    int answer = 0;
+    
+    for (int i = 0; i < n; i++) {
         if (visited[i] != 0)
             continue;
-        visited[i] = 1;
+        
         answer += 1;
-        //cout << "visit " << i << endl;
-        search(1, i);
+        visited[i] = 1;
+        dfs(i);
     }
     
     return answer;
