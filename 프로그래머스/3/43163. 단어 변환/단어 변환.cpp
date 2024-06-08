@@ -1,55 +1,61 @@
 #include <string>
 #include <vector>
-#include <iostream>
+#include <queue>
 
 using namespace std;
 
-vector<string> word;
-string tgt;
-int answer = 100000;
-int visited[55] = {0,};
+int answer = 0;
 
-void search(string s, int cnt) {
-    if (s == tgt) {
-        answer = min(answer, cnt);
-        //cout << cnt << " " << answer << endl;
-        return;
-    }
+void bfs(string start, string end, vector<string> word) {
+    queue<pair<string, int>> q;
+    q.push(make_pair(start, 0));
+    int n = word.size();
+    vector<int> visited(n, 0);
     
-    for (int i = 0; i < word.size(); i++) {
-        if (visited[i] != 0)
-            continue;
+    while (!q.empty()) {
+        string str = q.front().first;
+        int cnt = q.front().second;
+        q.pop();
         
-        int diff = 0;
-        for (int j = 0; j < word[i].length(); j++) {
-            if (s[j] != word[i][j])
-                diff += 1;
+        if (str == end) {
+            answer = cnt;
+            break;
         }
-        // 2글자 이상 다르면 패스
-        if (diff > 1)
-            continue;
         
-        visited[i] = 1;
-        search(word[i], cnt + 1);
-        visited[i] = 0;
+        for (int i = 0; i < word.size(); i++) {
+            if (visited[i] != 0)
+                continue;
+            
+            /* words 배열에서 한 글자 차이나는 단어 찾기 */
+            string s = word[i];
+            
+            int diff = 0;
+            for (int idx = 0; idx < s.length(); idx++) {
+                if (s[idx] != str[idx])
+                    diff += 1;
+            }
+
+            if (diff == 1) {
+                q.push(make_pair(s, cnt + 1));
+                visited[i] = 1;
+            }
+        }
+        
     }
 }
 
-int solution(string begin, string target, vector<string> words) { 
-    word = words;
-    tgt = target;
-    
-    // 변환할 수 없는 경우
-    bool psbl = false;
-    for (int i = 0; i < words.size(); i++) {
-        if (target == words[i])
-            psbl = true;
+int solution(string bgn, string tgt, vector<string> words) {
+    bool in = false;
+    for (auto it : words) {
+        if (it == tgt)
+            in = true;
     }
-    if (!psbl) 
-        return 0;
     
-    // 변환
-    search(begin, 0);
+    // words 안에 없기 때문에 변환할 수 없습니다.
+    if (!in)
+        return answer;
+    
+    bfs(bgn, tgt, words);
     
     return answer;
 }
