@@ -1,89 +1,79 @@
-import sys, copy
 from collections import deque
+import copy
+import sys
 input = sys.stdin.readline
 
 n, m = map(int, input().split())
-ice = [[] for _ in range(n)]
-for i in range(n):
-    arr = list(map(int, input().split()))
-    ice[i] = arr
-tempice = copy.deepcopy(ice)
+glacier = [list(map(int, input().split())) for _ in range(n)]
 
-dx = [-1, 1, 0, 0]
+answer = 0
+dx = [1, -1, 0, 0]
 dy = [0, 0, -1, 1]
 
-############################################################
-def melt():
-    global ice, tempice
-    for i in range(n):
-        for j in range(m):
-            if ice[i][j] <= 0: 
-                continue
-
-            # 사방의 바다 찾기
-            cnt = 0
-            for k in range(4):
-                nx = i + dx[k]
-                ny = j + dy[k]
-                if nx < 0 or nx >= n or ny < 0 or ny >= m:
-                    continue
-                if ice[nx][ny] <= 0:
-                    cnt += 1
-            
-            # 녹이기
-            tempice[i][j] -= cnt
-            if tempice[i][j] < 0:
-                tempice[i][j] = 0
-    ice = copy.deepcopy(tempice)
-
-def bfs(visit, i, j):
+def bfs(i, j, visited):
     q = deque()
-    visit[i][j] = 1
     q.append((i, j))
+    visited[i][j] = 1
+
     while q:
         x, y = q.popleft()
-
         for i in range(4):
             nx = x + dx[i]
             ny = y + dy[i]
-            if nx < 0 or nx >= n or ny < 0 or ny >= m:
+
+            if not 0 <= nx < n or not 0 <= ny < m:
                 continue
-            if visit[nx][ny] != 0:
-                continue
-            if ice[nx][ny] <= 0:
+            if visited[nx][ny] != 0 or glacier[nx][ny] <= 0:
                 continue
             
-            visit[nx][ny] = 1
-            q.append((nx, ny))
+            q.append((nx, ny))   
+            visited[nx][ny] = 1
 
-# 분리된 빙산 찾기
-def findGlacier(visit):
-    iceberg = 0
+def melt(glacier):
+    tmp_map = copy.deepcopy(glacier)
+
+    for x in range(n):
+        for y in range(m):
+            if glacier[x][y] <= 0:
+                continue
+            
+            # 인접한 바다의 수만큼 빙산이 녹는다.
+            adj0 = 0
+            for i in range(4):
+                nx = x + dx[i]
+                ny = y + dy[i]
+
+                if not 0 <= nx < n or not 0 <= ny < m:
+                    continue
+                
+                if glacier[nx][ny] <= 0:
+                    adj0 += 1
+
+            tmp_map[x][y] = max(0, glacier[x][y] - adj0)
+
+    return tmp_map
+
+while True:
+    answer += 1
+    glacier = melt(glacier)
+
+    visited = [[0 for _ in range(m)] for _ in range(n)]
+    cnt = 0
     for i in range(n):
         for j in range(m):
-            if visit[i][j] != 0:
+            if visited[i][j] != 0 or glacier[i][j] <= 0:
                 continue
-            if ice[i][j] <= 0:
-                continue
-            iceberg += 1
-            visit[i][j] = 1
-            bfs(visit, i, j)
-    return iceberg
-############################################################
-
-# main
-
-visited = [[0 for _ in range(m)] for _ in range(n)]
-init = findGlacier(visited)
-time = 0
-while True:
-    visited = [[0 for _ in range(m)] for _ in range(n)]
-    time += 1
-    melt()
-    now = findGlacier(visited)
-    if init < now: # 분리
-        print(time)
+            
+            cnt += 1
+            bfs(i, j, visited)
+    
+    # 빙산 분리됨
+    if cnt > 1:
         break
-    elif now == 0: # 다 녹을 때까지 분리 x
-        print(0)
+
+    # 분리되지 않는 빙산
+    if cnt == 0:
+        answer = 0
         break
+
+print(answer)
