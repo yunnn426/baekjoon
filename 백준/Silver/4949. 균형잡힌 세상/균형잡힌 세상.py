@@ -2,6 +2,7 @@ from collections import deque
 import sys
 input = sys.stdin.readline
 
+pair = {')' : '(', ']' : '['}
 while True:
     string = input().rstrip()
     if string == '.': break
@@ -18,7 +19,7 @@ while True:
                 break
 
             bracket = st.pop()
-            if (string[idx] == ')' and bracket != '(') or (string[idx] == ']' and bracket != '['):
+            if bracket != pair[string[idx]]:
                 balanced = False
                 break
         
