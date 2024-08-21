@@ -10,27 +10,15 @@ while True:
     st = deque()
     balanced = True
     while string[idx] != '.':
-        if string[idx] == '(':
-            st.append('(')
-
-        elif string[idx] == '[':
-            st.append('[')
-
-        elif string[idx] == ')':
+        if string[idx] in '([':
+            st.append(string[idx])
+        elif string[idx] in ')]':
             if len(st) == 0:
                 balanced = False
                 break
-            bracket = st.pop()
-            if bracket != '(':
-                balanced = False
-                break
 
-        elif string[idx] == ']':
-            if len(st) == 0:
-                balanced = False
-                break
             bracket = st.pop()
-            if bracket != '[':
+            if (string[idx] == ')' and bracket != '(') or (string[idx] == ']' and bracket != '['):
                 balanced = False
                 break
         
